@@ -1,0 +1,31 @@
+# Entornos virtuales y caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Estado de sesión local (contiene rutas locales y asignaciones cargadas)
+proyecto_ply.json
+
+# Orígenes cartográficos y bases de datos (pesados / datos sensibles)
+*.mdb
+*.ldb
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+
+# Salidas generadas y pruebas locales
+*.ply
+*.csv
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.config/
+sample_data/

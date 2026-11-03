@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: road-coverings-ply
+    # Mapea el puerto de tu app (ejemplo: cambia 8000 si tu app usa el 5000 o el 80)
+    ports:
+      - "5000:5000"
+    # Volúmenes: Permite que cambies tu código o tu HTML localmente y se actualice dentro de Docker sin reiniciar
+    volumes:
+      - .:/app
+    # Reinicia el contenedor automáticamente si falla
+    restart: always
+    environment:
+      - PORT=5000

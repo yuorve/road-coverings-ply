@@ -1,0 +1,1486 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zonas de influencia a PLY</title>
+<style>
+:root{--bg:#f4f6f8;--panel:#fff;--tx:#1d2733;--mut:#5b6877;--bd:#d3dae2;--ac:#1f6feb;--acx:#fff;--err:#c62828;--ok:#2e7d32;--warn:#a05a00}
+@media (prefers-color-scheme:dark){:root{--bg:#14181d;--panel:#1c222a;--tx:#e6ebf1;--mut:#9aa7b5;--bd:#333c47;--ac:#58a6ff;--acx:#0d1117;--err:#ff7b72;--ok:#56d364;--warn:#e3b341}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif}
+header{padding:14px 22px;border-bottom:1px solid var(--bd);background:var(--panel)}
+header h1{margin:0;font-size:18px}
+main{max-width:1100px;margin:0 auto;padding:16px 22px 60px}
+section{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+h2{margin:0 0 10px;font-size:15px}
+section.colapsable > h2{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;margin:0;padding:2px 0;transition:color .15s}
+section.colapsable > h2:hover{color:var(--ac)}
+section.colapsable > h2::after{content:"▾";font-size:16px;color:var(--mut);transition:transform .2s ease}
+section.colapsable.cerrada > h2::after{transform:rotate(-90deg)}
+section.colapsable > .sec-body{margin-top:12px}
+section.colapsable.cerrada > .sec-body{display:none}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:2px}
+input,select,textarea{width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx);font:inherit}
+input:disabled{opacity:.55;cursor:not-allowed;background:var(--bd)}
+input.invalido{border-color:var(--err);outline-color:var(--err)}
+textarea{min-height:90px;resize:vertical}
+.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.fila>div{flex:1 1 160px}
+.fila>div.ancho{flex:3 1 340px}
+button{padding:7px 14px;border:1px solid var(--bd);border-radius:5px;background:var(--panel);color:var(--tx);font:inherit;cursor:pointer}
+button.pri{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+button:disabled{opacity:.55;cursor:wait}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--mut);text-align:left;font-weight:600;padding:4px 6px}
+td{padding:4px 6px;vertical-align:top}
+td input,td select{padding:5px 6px}
+.esz{width:92px;white-space:nowrap}
+.esz-box{display:flex;align-items:center;gap:5px}
+.esz-input{width:68px;padding:5px 6px;text-align:right}
+.pkc{width:100px}
+.est{font-size:12px;min-width:150px}
+.ok{color:var(--ok)}.err{color:var(--err)}.warn{color:var(--warn)}.mut{color:var(--mut)}
+.hint{font-size:11px;color:var(--mut);margin-top:2px}
+.hint.err{color:var(--err);font-weight:500}
+#msg{position:sticky;top:0;z-index:5;margin-bottom:12px;max-height:35vh;overflow:auto}
+#msg div{padding:8px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--panel);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+#msg .e{border-color:var(--err);color:var(--err)}
+#msg .w{border-color:var(--warn);color:var(--warn)}
+#msg .o{border-color:var(--ok);color:var(--ok)}
+#msg .l{border-color:var(--ac);color:var(--ac);font-weight:500}
+@keyframes giro{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:giro .75s linear infinite;flex-shrink:0}
+svg{width:100%;height:auto;background:#ffffff;border:1px solid var(--bd);border-radius:6px;display:block}
+.chip{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:2px;vertical-align:middle;flex-shrink:0}
+details{margin-top:6px}
+.herr{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.herr button{padding:5px 12px}
+.herr button.act{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+#mapa{cursor:grab;touch-action:none;user-select:none}
+summary{cursor:pointer;color:var(--mut)}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#leyenda_mant{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:8px;padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);font-size:12px}
+.barra-filtro{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding:8px 10px;margin-bottom:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg)}
+.barra-filtro > div{flex:1 1 180px}
+.barra-filtro > div.f-info{flex:0 0 auto;align-self:center;font-size:12px;color:var(--mut)}
+#paginacion_tabla{display:none;align-items:center;justify-content:center;gap:10px;padding:10px;margin-top:6px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:12px}
+.mapa-wrap{position:relative}
+#tip_mapa{display:none;position:absolute;z-index:10;min-width:220px;max-width:340px;padding:9px 11px;border-radius:7px;background:var(--panel);color:var(--tx);border:1px solid var(--bd);box-shadow:0 4px 16px rgba(0,0,0,.22);font-size:12.5px;line-height:1.4;pointer-events:auto}
+#tip_mapa .tip-cab{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700;font-size:13px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+#tip_mapa .tip-x{border:none;background:transparent;color:var(--mut);padding:0 4px;font-size:15px;line-height:1;cursor:pointer}
+#tip_mapa .tip-x:hover{color:var(--tx)}
+#tip_mapa .tip-fila{margin:2px 0}
+#tip_mapa .tip-acc{margin-top:6px;padding-top:5px;border-top:1px solid var(--bd);display:flex;flex-wrap:wrap;gap:6px}
+#tip_mapa .tip-acc button{padding:3px 8px;font-size:11.5px}
+</style>
+</head>
+<body>
+<header><h1>Zonas de influencia a PLY</h1></header>
+<main>
+<div id="msg"></div>
+
+<section class="colapsable" id="sec_1">
+  <h2 title="Haz clic para contraer o expandir esta sección">1. Datos de origen</h2>
+  <div class="sec-body">
+    <div class="hint" style="margin-bottom:8px">Añada uno o varios archivos. Cada uno puede ser un almacén .mdb de GeoMedia o un shapefile, y aporta ejes de carretera, puntos kilométricos, municipios o provincias. Municipios y provincias son opcionales: se dibujan de fondo en el mapa para situar las carreteras.</div>
+    <table>
+      <thead><tr><th>Tipo</th><th>Contiene</th><th>Ruta del archivo</th><th>Capa (solo .mdb)</th><th>EPSG origen</th><th></th></tr></thead>
+      <tbody id="fuentes"></tbody>
+    </table>
+    <div class="acciones">
+      <button id="b_add_fuente">+ Añadir origen</button>
+      <button class="pri" id="b_conectar">Conectar y leer datos</button>
+      <span id="st_datos" class="mut" style="align-self:center"></span>
+    </div>
+    <div id="capas"></div>
+  </div>
+</section>
+
+<section class="colapsable" id="sec_2">
+  <h2 title="Haz clic para contraer o expandir esta sección">2. Mantenedores</h2>
+  <div class="sec-body">
+    <label>Un nombre por línea (ordenados alfabéticamente). El campo VALUE del PLY sale siempre de esta lista y determina el color de cada cobertura.</label>
+    <textarea id="mantenedores"></textarea>
+  </div>
+</section>
+
+<section class="colapsable" id="sec_3">
+  <h2 title="Haz clic para contraer o expandir esta sección">3. Asignaciones (ordenadas automáticamente por Mantenedor)</h2>
+  <div class="sec-body">
+    <div class="barra-filtro">
+      <div>
+        <label>🔍 Filtrar por Vía exacta (o nº ESZ)</label>
+        <input id="f_txt" list="dl_vias" placeholder="Ej: A-32, A-92, N-340…">
+      </div>
+      <div>
+        <label>🏢 Filtrar por Mantenedor</label>
+        <select id="f_mant"><option value="">(Todos los mantenedores)</option></select>
+      </div>
+      <div>
+        <label>🚦 Filtrar por Estado</label>
+        <select id="f_est">
+          <option value="">(Todos los estados)</option>
+          <option value="trazado">🛣️ Solo fuera de trazado CARRETERAS_BCN</option>
+          <option value="warn">⚠️ Solo con aviso (trazado o solape)</option>
+          <option value="err">❌ Solo con error</option>
+          <option value="ok">✅ Solo correctas sin aviso</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto">
+        <button id="b_limpiar_filtro" title="Mostrar todas las filas y todas las zonas en el mapa">Limpiar filtro</button>
+      </div>
+      <div class="f-info" id="lbl_filtro"></div>
+    </div>
+
+    <table>
+      <thead><tr><th>ESZ</th><th>Vía</th><th>PK desde</th><th>PK hasta</th><th>Mantenedor</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="filas"></tbody>
+    </table>
+    <div id="paginacion_tabla">
+      <span id="txt_paginacion" class="mut"></span>
+      <button id="b_mas_filas">+ Mostrar 200 más</button>
+      <button id="b_todas_filas">Mostrar todas</button>
+    </div>
+
+    <div class="acciones">
+      <button id="b_add">+ Añadir asignación</button>
+      <input type="file" id="f_csv" accept=".csv,.txt" style="display:none">
+      <button id="b_imp_csv" title="Importar archivo CSV con columnas: VIA, PK inicio, PK fin, Mantenedor (y opcionalmente ESZ)">📂 Importar CSV</button>
+      <button id="b_limpiar_asig" title="Vaciar todas las asignaciones">Vaciar tabla</button>
+      <button class="pri" id="b_prev">Previsualizar y ordenar</button>
+      <button id="b_guardar">Guardar y ordenar</button>
+      <span id="st_prev" class="mut" style="align-self:center"></span>
+    </div>
+    <div id="descartes_csv"></div>
+    <details><summary>Opciones</summary>
+      <div class="fila" style="margin-top:8px">
+        <div><label>Ancho a cada lado (m)</label><input id="o_ancho"></div>
+        <div><label>Segmentos por cuarto de círculo</label><input id="o_quad"></div>
+        <div><label>ESZ inicial</label><input id="o_esz"></div>
+        <div class="ancho"><label>Cabecera: clase de entidad</label><input id="o_clase"></div>
+        <div><label>Saltos de línea</label><select id="o_saltos"><option value="crlf">Windows (CRLF)</option><option value="lf">Unix (LF)</option></select></div>
+        <div><label>Codificación del PLY</label><input id="o_enc"></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="sec_4">
+  <h2>4. Vista previa y exportación <span id="sub_mapa_filtro" class="mut" style="font-weight:normal;font-size:13px"></span></h2>
+  <div class="herr" role="toolbar" aria-label="Herramientas del mapa">
+    <button id="z_in" title="Acercar la vista (también: rueda del ratón o doble clic)">+ Acercar</button>
+    <button id="z_out" title="Alejar la vista">&minus; Alejar</button>
+    <button id="z_mano" class="act" title="Desplazar la vista: arrastre el mapa con el ratón o el dedo">Desplazar</button>
+    <button id="z_todo" title="Volver a encuadrar las zonas visibles">Ver todo</button>
+    <label style="display:flex;gap:6px;align-items:center;margin-left:12px;color:var(--tx)"><input type="checkbox" id="o_mun" style="width:auto" checked> Mostrar límites municipales y provinciales de fondo</label>
+  </div>
+  <div class="mapa-wrap" id="wrap_mapa">
+    <svg id="mapa" viewBox="0 0 900 380"></svg>
+    <div id="tip_mapa" role="dialog" aria-label="Detalle de cobertura"></div>
+  </div>
+  <div id="leyenda_mant" style="display:none"></div>
+  <div class="hint">Haga clic sobre cualquier cobertura (o sobre un círculo rojo de desvío 🎯) para ver su ESZ, Vía, PKs y Mantenedor.</div>
+  <div class="acciones">
+    <button class="pri" id="b_ply">Exportar PLY</button>
+    <button id="b_csv">Exportar tabla de asignaciones (CSV)</button>
+  </div>
+</section>
+</main>
+
+<datalist id="dl_vias"></datalist>
+
+<script>
+const $ = s => document.querySelector(s);
+const COLORES = [
+  '#e6194b','#3cb44b','#0082c8','#f58231','#911eb4','#46f0f0','#f032e6','#d2f53c',
+  '#fabebe','#008080','#e6beff','#aa6e28','#800000','#808000','#000080','#f0ad00'
+];
+
+const CAPA_DEF = {ejes: 'CARRETERAS_BCN', pk: 'PK_VIA', municipios: 'da02_term_munic_mod_AF_SHP', provincias: 'da03_provincia_AF_SHP'};
+
+function proyectoPorDefecto() {
+  return {
+    fuentes: [
+      {tipo: 'mdb', rol: 'ejes', ruta: '', capa: 'CARRETERAS_BCN', epsg_origen: ''},
+      {tipo: 'mdb', rol: 'pk', ruta: '', capa: 'PK_VIA', epsg_origen: ''},
+      {tipo: 'mdb', rol: 'municipios', ruta: '', capa: 'da02_term_munic_mod_AF_SHP', epsg_origen: ''},
+      {tipo: 'mdb', rol: 'provincias', ruta: '', capa: 'da03_provincia_AF_SHP', epsg_origen: ''}
+    ],
+    opciones: {ancho: 20, quad_segs: 18, esz_inicio: 1, clase: 'Cobertura MVIA.F6_Coberturas', saltos: 'crlf', enc_ply: 'latin-1', mostrar_municipios: true},
+    mantenedores: [],
+    asignaciones: []
+  };
+}
+
+let P = proyectoPorDefecto();
+let VIAS = [];
+let MAPA_VIAS = new Map();
+let R = [];
+let FONDO = {lineas: [], provincias: [], etiquetas: [], rellenos: []};
+let NMUN = 0;
+let NPROV = 0;
+let MAPA_COLORES = new Map();
+let LIMITE_FILAS = 150;
+let SEL_IDX = null;
+
+const cmpAlfa = (a, b) => a.localeCompare(b, 'es', {sensitivity: 'base'});
+
+document.querySelectorAll('section.colapsable > h2').forEach(h2 => {
+  h2.addEventListener('click', () => {
+    h2.parentElement.classList.toggle('cerrada');
+  });
+});
+
+function setColapsada(idSec, cerrar) {
+  const el = $(idSec);
+  if (el) el.classList.toggle('cerrada', cerrar);
+}
+
+const ESTILO_GEOMEDIA = {
+  tierra: '#fdfac7',
+  municipios: {color: '#d9be8b', ancho: 0.75, opacidad: 0.95},
+  provincias: {color: '#008080', ancho: 1.35, opacidad: 1.0}
+};
+
+function reconstruirCacheColores() {
+  MAPA_COLORES.clear();
+  const unicos = [];
+  const vistos = new Set();
+  (P ? P.mantenedores : []).concat((P ? P.asignaciones : []).map(a => a.value)).forEach(m => {
+    const k = (m || '').trim().toUpperCase();
+    if (k && !vistos.has(k)) { vistos.add(k); unicos.push(k); }
+  });
+  unicos.sort(cmpAlfa);
+  unicos.forEach((k, idx) => {
+    MAPA_COLORES.set(k, COLORES[idx % COLORES.length]);
+  });
+}
+
+function colorMantenedor(val) {
+  const limpio = (val || '').trim().toUpperCase();
+  if (!limpio) return '#888888';
+  if (!MAPA_COLORES.has(limpio)) reconstruirCacheColores();
+  return MAPA_COLORES.get(limpio) || COLORES[0];
+}
+
+function precalcularBBoxesResultados() {
+  R.forEach(r => {
+    if (!r || !r.ok || !r.polis) return;
+    r.bboxes = r.polis.map(p => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (let k = 0; k < p.length; k++) {
+        const x = p[k][0], y = p[k][1];
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+      return [x0, y0, x1, y1];
+    });
+  });
+}
+
+async function api(url, opt) {
+  const r = await fetch(url, opt);
+  let j = {};
+  try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error(j.error || ('Error ' + r.status));
+  return j;
+}
+const post = (u, b) => api(u, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(b)});
+
+function mensaje(txt, tipo) {
+  const d = document.createElement('div');
+  d.className = tipo || 'o';
+  if (tipo === 'l') {
+    const sp = document.createElement('span');
+    sp.className = 'spin';
+    d.appendChild(sp);
+  }
+  const spanTxt = document.createElement('span');
+  spanTxt.textContent = txt;
+  d.appendChild(spanTxt);
+  $('#msg').appendChild(d);
+  if (tipo !== 'e' && tipo !== 'l') setTimeout(() => d.remove(), tipo === 'w' ? 15000 : 5000);
+  return d;
+}
+function limpiaMensajes() { $('#msg').innerHTML = ''; }
+function avisos(lista) { (lista || []).forEach(a => mensaje(a, 'w')); }
+
+// ----------------------------------------------------------- formularios
+function aseguraFuentesMinimas() {
+  if (!P) P = proyectoPorDefecto();
+  if (!Array.isArray(P.fuentes) || !P.fuentes.length) {
+    P.fuentes = proyectoPorDefecto().fuentes;
+  } else {
+    [['ejes', 'CARRETERAS_BCN'], ['pk', 'PK_VIA'], ['municipios', 'da02_term_munic_mod_AF_SHP'], ['provincias', 'da03_provincia_AF_SHP']].forEach(([rol, capa]) => {
+      if (!P.fuentes.some(f => f.rol === rol)) {
+        P.fuentes.push({tipo: 'mdb', rol: rol, ruta: '', capa: capa, epsg_origen: ''});
+      }
+    });
+  }
+}
+
+function leeFormulario() {
+  P.opciones = {
+    ancho: $('#o_ancho').value, quad_segs: $('#o_quad').value, esz_inicio: $('#o_esz').value,
+    clase: $('#o_clase').value, saltos: $('#o_saltos').value, enc_ply: $('#o_enc').value,
+    mostrar_municipios: $('#o_mun').checked
+  };
+  P.mantenedores = $('#mantenedores').value.split('\n').map(s => s.trim()).filter(Boolean).sort(cmpAlfa);
+  reconstruirCacheColores();
+}
+
+function escribeFormulario() {
+  aseguraFuentesMinimas();
+  const o = P.opciones || proyectoPorDefecto().opciones;
+  $('#o_ancho').value = o.ancho; $('#o_quad').value = o.quad_segs; $('#o_esz').value = o.esz_inicio;
+  $('#o_clase').value = o.clase; $('#o_saltos').value = o.saltos; $('#o_enc').value = o.enc_ply; $('#o_mun').checked = o.mostrar_municipios !== false;
+  P.mantenedores = (P.mantenedores || []).slice().sort(cmpAlfa);
+  $('#mantenedores').value = P.mantenedores.join('\n');
+  reconstruirCacheColores();
+  pintaFuentes();
+}
+
+// ----------------------------------------------------------- orígenes
+function celdaSelect(pares, valor, alCambiar) {
+  const s = document.createElement('select');
+  pares.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; s.appendChild(o); });
+  s.value = valor; s.addEventListener('change', () => alCambiar(s.value));
+  return s;
+}
+
+function pintaFuentes() {
+  aseguraFuentesMinimas();
+  const tb = $('#fuentes'); tb.innerHTML = '';
+  P.fuentes.forEach((f, n) => {
+    const tr = document.createElement('tr');
+    const td = () => tr.appendChild(document.createElement('td'));
+    td().appendChild(celdaSelect([['mdb', 'Almacén .mdb'], ['shp', 'Shapefile']], f.tipo, v => { f.tipo = v; pintaFuentes(); }));
+    td().appendChild(celdaSelect([['ejes', 'Ejes de carretera'], ['pk', 'Puntos kilométricos'], ['municipios', 'Municipios (fondo del mapa)'], ['provincias', 'Provincias (fondo del mapa)']], f.rol, v => {
+      if (!f.capa || f.capa === CAPA_DEF[f.rol]) f.capa = CAPA_DEF[v];
+      f.rol = v; pintaFuentes();
+    }));
+    td().appendChild(celdaInput(f.ruta || '', '', v => f.ruta = v));
+    const ci = celdaInput(f.capa || '', '', v => f.capa = v); ci.disabled = f.tipo === 'shp';
+    td().appendChild(ci);
+    const ce = celdaInput(f.epsg_origen || '', 'pkc', v => f.epsg_origen = v); ce.disabled = f.tipo === 'shp'; ce.placeholder = '25830';
+    td().appendChild(ce);
+    const ta = td(); ta.style.whiteSpace = 'nowrap';
+    if (f.tipo === 'mdb') {
+      const bl = document.createElement('button'); bl.textContent = 'Listar capas';
+      bl.addEventListener('click', () => capas(n)); ta.appendChild(bl); ta.append(' ');
+    }
+    const bq = document.createElement('button'); bq.textContent = 'Quitar';
+    bq.addEventListener('click', () => { P.fuentes.splice(n, 1); $('#capas').innerHTML = ''; pintaFuentes(); });
+    ta.appendChild(bq);
+    tb.appendChild(tr);
+  });
+}
+
+function añadeFuente() {
+  const rol = P.fuentes.some(f => f.rol === 'ejes') && !P.fuentes.some(f => f.rol === 'pk') ? 'pk' : 'ejes';
+  P.fuentes.push({tipo: 'mdb', rol: rol, ruta: '', capa: CAPA_DEF[rol], epsg_origen: ''});
+  pintaFuentes();
+}
+
+function fuentesCompletas() {
+  const act = P.fuentes.filter(f => (f.rol !== 'municipios' && f.rol !== 'provincias') || (f.ruta && f.ruta.trim()));
+  return act.length > 0 && act.every(f => f.ruta && f.ruta.trim()) &&
+    act.some(f => f.rol === 'ejes') && act.some(f => f.rol === 'pk');
+}
+
+// -------------------------------------------------------------- vías y validación de PKs por tramos
+function pintaVias() {
+  const dl = $('#dl_vias'); dl.innerHTML = '';
+  MAPA_VIAS.clear();
+  const frag = document.createDocumentFragment();
+  VIAS.forEach(v => {
+    MAPA_VIAS.set(v.via.toUpperCase(), v);
+    const o = document.createElement('option');
+    o.value = v.via;
+    frag.appendChild(o);
+  });
+  dl.appendChild(frag);
+  $('#st_datos').textContent = VIAS.length ? VIAS.length + ' vías' + (NMUN ? ', ' + NMUN + ' municipios' : '') + (NPROV ? ', ' + NPROV + ' provincias' : '') + ' leídos' : '';
+}
+
+function parseNumPK(s) {
+  if (s === null || s === undefined) return NaN;
+  const t = String(s).trim().replace(',', '.');
+  return t === '' ? NaN : Number(t);
+}
+
+function infoVia(nombre) {
+  if (!VIAS.length) return '';
+  const clave = (nombre || '').trim().toUpperCase();
+  if (!clave) return '';
+  const v = MAPA_VIAS.get(clave);
+  if (!v) return 'Vía no encontrada en los datos';
+  if (v.pk_min === null || v.n_pk < 2) return 'Sin PK (se tomará el recorrido completo; PK en blanco)';
+  if (v.rangos_pk && v.rangos_pk.length > 1) {
+    const txtRangos = v.rangos_pk.map(([a, b]) => (a === b ? `${a}` : `${a} a ${b}`)).join(' · ');
+    return `Vía discontinua (${v.rangos_pk.length} tramos): PK ${txtRangos}`;
+  }
+  return 'PK disponibles: ' + v.pk_min + ' a ' + v.pk_max;
+}
+
+function sincronizarEstadoPKFila(a, inDesde, inHasta, hintEl) {
+  const txtBase = infoVia(a.via);
+  hintEl.textContent = txtBase;
+  hintEl.classList.remove('err');
+  inDesde.classList.remove('invalido');
+  inHasta.classList.remove('invalido');
+
+  if (!VIAS.length) return;
+  const clave = (a.via || '').trim().toUpperCase();
+  const v = MAPA_VIAS.get(clave);
+  if (!v) return;
+
+  if (v.pk_min === null || v.n_pk < 2) {
+    a.pk_desde = '';
+    a.pk_hasta = '';
+    inDesde.value = '';
+    inHasta.value = '';
+    inDesde.disabled = true;
+    inHasta.disabled = true;
+    inDesde.placeholder = '—';
+    inHasta.placeholder = '—';
+    return;
+  }
+
+  inDesde.disabled = false;
+  inHasta.disabled = false;
+  const rangos = (v.rangos_pk && v.rangos_pk.length) ? v.rangos_pk : [[v.pk_min, v.pk_max]];
+  inDesde.placeholder = rangos.length > 1 ? 'inicio tramo' : String(v.pk_min);
+  inHasta.placeholder = rangos.length > 1 ? 'fin tramo' : String(v.pk_max);
+
+  const p0 = parseNumPK(a.pk_desde);
+  const p1 = parseNumPK(a.pk_hasta);
+
+  if (!isNaN(p0) && !isNaN(p1) && p0 >= p1) {
+    inDesde.classList.add('invalido');
+    inHasta.classList.add('invalido');
+    hintEl.textContent = `❌ PK desde (${p0}) debe ser menor que PK hasta (${p1}).`;
+    hintEl.classList.add('err');
+    return;
+  }
+
+  if (rangos.length > 1) {
+    const tol = 1.5;
+    const txtRangos = rangos.map(([ra, rb]) => (ra === rb ? `${ra}` : `${ra} a ${rb}`)).join(' · ');
+
+    const idxTramo0 = !isNaN(p0) ? rangos.findIndex(([ra, rb]) => p0 >= ra - tol && p0 <= rb + tol) : -2;
+    const idxTramo1 = !isNaN(p1) ? rangos.findIndex(([ra, rb]) => p1 >= ra - tol && p1 <= rb + tol) : -2;
+
+    if (idxTramo0 === -1) {
+      inDesde.classList.add('invalido');
+      hintEl.textContent = `❌ PK desde (${p0}) fuera de los tramos de la vía (${txtRangos}).`;
+      hintEl.classList.add('err');
+      return;
+    }
+    if (idxTramo1 === -1) {
+      inHasta.classList.add('invalido');
+      hintEl.textContent = `❌ PK hasta (${p1}) fuera de los tramos de la vía (${txtRangos}).`;
+      hintEl.classList.add('err');
+      return;
+    }
+    if (idxTramo0 >= 0 && idxTramo1 >= 0 && idxTramo0 !== idxTramo1) {
+      inDesde.classList.add('invalido');
+      inHasta.classList.add('invalido');
+      const [r1a, r1b] = rangos[idxTramo0];
+      const [r2a, r2b] = rangos[idxTramo1];
+      hintEl.textContent = `❌ PK ${p0} y PK ${p1} están en tramos discontinuos distintos (${r1a} a ${r1b} y ${r2a} a ${r2b}). Cree una fila por tramo.`;
+      hintEl.classList.add('err');
+    }
+  }
+}
+
+// ------------------------------------------------------------- tabla y filtros
+function celdaInput(valor, clase, alCambiar, lista) {
+  const i = document.createElement('input');
+  i.value = valor; if (clase) i.className = clase;
+  if (lista) i.setAttribute('list', lista);
+  i.addEventListener('input', () => alCambiar(i.value));
+  return i;
+}
+
+function hayFiltroActivo() {
+  return Boolean(($('#f_txt').value || '').trim() || ($('#f_mant').value || '').trim() || ($('#f_est').value || ''));
+}
+
+function filaCumpleFiltro(a, n) {
+  if (!a) return false;
+  if (a._nueva) return true;
+
+  const q = ($('#f_txt').value || '').trim().toUpperCase();
+  const fMant = ($('#f_mant').value || '').trim().toUpperCase();
+  const fEst = $('#f_est').value || '';
+
+  if (fMant && (a.value || '').trim().toUpperCase() !== fMant) return false;
+  if (q) {
+    const viaExacta = (a.via || '').trim().toUpperCase();
+    const eszExacto = String(a.esz || '').trim().toUpperCase();
+    if (viaExacta !== q && eszExacto !== q) return false;
+  }
+  if (fEst) {
+    const r = R[n];
+    if (!r) return false;
+    if (fEst === 'trazado' && !(r.ok && r.fuera_trazado)) return false;
+    if (fEst === 'warn' && !(r.ok && r.aviso)) return false;
+    if (fEst === 'err' && r.ok) return false;
+    if (fEst === 'ok' && !(r.ok && !r.aviso)) return false;
+  }
+  return true;
+}
+
+function actualizaComboFiltroMant(mantOrdenados) {
+  const sel = $('#f_mant');
+  const valActual = sel.value;
+  sel.innerHTML = '<option value="">(Todos los mantenedores)</option>';
+  const conteo = {};
+  (P ? P.asignaciones : []).forEach(a => {
+    const k = (a.value || '').trim();
+    if (k) conteo[k] = (conteo[k] || 0) + 1;
+  });
+  const frag = document.createDocumentFragment();
+  mantOrdenados.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m;
+    o.textContent = conteo[m] ? `${m} (${conteo[m]})` : m;
+    frag.appendChild(o);
+  });
+  sel.appendChild(frag);
+  if (mantOrdenados.includes(valActual)) sel.value = valActual;
+}
+
+function pintaTabla() {
+  if (!P) return;
+  reconstruirCacheColores();
+  const tb = $('#filas'); tb.innerHTML = '';
+  const setMant = new Set(P.mantenedores || []);
+  (P.asignaciones || []).forEach(x => { if (x.value) setMant.add(x.value); });
+  const mantOrdenados = Array.from(setMant).filter(Boolean).sort(cmpAlfa);
+  actualizaComboFiltroMant(mantOrdenados);
+
+  const protoSelect = document.createElement('select');
+  [''].concat(mantOrdenados).forEach(m => {
+    const o = document.createElement('option');
+    o.value = m;
+    o.textContent = m || '(elegir)';
+    protoSelect.appendChild(o);
+  });
+
+  const indicesCoincidentes = [];
+  const total = (P.asignaciones || []).length;
+  for (let n = 0; n < total; n++) {
+    if (filaCumpleFiltro(P.asignaciones[n], n)) {
+      indicesCoincidentes.push(n);
+    }
+  }
+
+  const visiblesTotal = indicesCoincidentes.length;
+  const mostrarAhora = Math.min(visiblesTotal, LIMITE_FILAS);
+  const indicesRender = indicesCoincidentes.slice(0, mostrarAhora);
+  for (let k = mostrarAhora; k < visiblesTotal; k++) {
+    const idxExtra = indicesCoincidentes[k];
+    if (P.asignaciones[idxExtra] && P.asignaciones[idxExtra]._nueva) {
+      indicesRender.push(idxExtra);
+    }
+  }
+  const frag = document.createDocumentFragment();
+
+  for (let k = 0; k < indicesRender.length; k++) {
+    const n = indicesRender[k];
+    const a = P.asignaciones[n];
+    const tr = document.createElement('tr');
+    const td = () => tr.appendChild(document.createElement('td'));
+
+    const tEsz = td(); tEsz.className = 'esz';
+    const boxEsz = document.createElement('div'); boxEsz.className = 'esz-box';
+    const chip = document.createElement('span'); chip.className = 'chip';
+    chip.style.background = colorMantenedor(a.value);
+    const inpEsz = document.createElement('input');
+    inpEsz.type = 'number';
+    inpEsz.min = '1';
+    inpEsz.step = '1';
+    inpEsz.className = 'esz-input';
+    inpEsz.placeholder = 'auto';
+    inpEsz.title = 'Código ESZ positivo (deje vacío para asignación automática)';
+    inpEsz.value = (a.esz !== null && a.esz !== undefined && Number(a.esz) > 0) ? a.esz : '';
+    inpEsz.addEventListener('input', () => {
+      const v = parseInt(inpEsz.value, 10);
+      a.esz = (!isNaN(v) && v > 0) ? v : null;
+    });
+    boxEsz.appendChild(chip);
+    boxEsz.appendChild(inpEsz);
+    tEsz.appendChild(boxEsz);
+
+    const tVia = td();
+    const hint = document.createElement('div'); hint.className = 'hint';
+    const inDesde = celdaInput(a.pk_desde || '', 'pkc', v => {
+      a.pk_desde = v;
+      sincronizarEstadoPKFila(a, inDesde, inHasta, hint);
+    });
+    const inHasta = celdaInput(a.pk_hasta || '', 'pkc', v => {
+      a.pk_hasta = v;
+      sincronizarEstadoPKFila(a, inDesde, inHasta, hint);
+    });
+
+    tVia.appendChild(celdaInput(a.via || '', '', v => {
+      a.via = v;
+      sincronizarEstadoPKFila(a, inDesde, inHasta, hint);
+    }, 'dl_vias'));
+    tVia.appendChild(hint);
+
+    td().appendChild(inDesde);
+    td().appendChild(inHasta);
+
+    sincronizarEstadoPKFila(a, inDesde, inHasta, hint);
+
+    const sel = protoSelect.cloneNode(true);
+    if (a.value && !mantOrdenados.includes(a.value)) {
+      const oExtra = document.createElement('option');
+      oExtra.value = a.value; oExtra.textContent = a.value;
+      sel.appendChild(oExtra);
+    }
+    sel.value = a.value || '';
+    sel.addEventListener('change', () => {
+      a.value = sel.value;
+      reconstruirCacheColores();
+      chip.style.background = colorMantenedor(a.value);
+      dibuja();
+    });
+    td().appendChild(sel);
+
+    const tEst = td(); tEst.className = 'est';
+    const r = R[n];
+    if (r) {
+      const t = document.createElement('span');
+      if (r.ok && r.aviso) {
+        t.className = 'warn';
+        t.textContent = (r.fuera_trazado ? '🛣️ ' : '⚠️ ') + r.n_poligonos + ' pol., ' + r.n_vertices + ' vért. — ' + r.aviso;
+      } else if (r.ok) {
+        t.className = 'ok';
+        t.textContent = r.n_poligonos + ' polígono(s), ' + r.n_vertices + ' vértices' + (r.huecos ? ' (¡con hueco!)' : '');
+      } else {
+        t.className = 'err';
+        t.textContent = r.error;
+      }
+      tEst.appendChild(t);
+    }
+
+    const tDel = td();
+    const b = document.createElement('button'); b.textContent = 'Quitar';
+    b.addEventListener('click', () => { ocultarTooltipMapa(); P.asignaciones.splice(n, 1); R.splice(n, 1); VISTA = null; pintaTabla(); dibuja(); });
+    tDel.appendChild(b);
+    frag.appendChild(tr);
+  }
+
+  tb.appendChild(frag);
+
+  const filtrado = hayFiltroActivo();
+  $('#lbl_filtro').textContent = filtrado
+    ? `Mostrando ${visiblesTotal} de ${total} asignaciones`
+    : `Total: ${total} asignaciones`;
+
+  $('#sub_mapa_filtro').textContent = filtrado
+    ? `— Filtro activo: mostrando ${visiblesTotal} de ${total} cobertura(s)`
+    : '';
+
+  const divPag = $('#paginacion_tabla');
+  if (visiblesTotal > mostrarAhora) {
+    $('#txt_paginacion').textContent = `Mostrando en la tabla ${mostrarAhora} de ${visiblesTotal} filas (el mapa y la exportación incluyen las ${visiblesTotal} completas).`;
+    divPag.style.display = 'flex';
+  } else {
+    divPag.style.display = 'none';
+  }
+}
+
+function aplicarFiltroTabla(actualizarMapa) {
+  LIMITE_FILAS = 150;
+  ocultarTooltipMapa();
+  pintaTabla();
+  if (actualizarMapa && R.length) {
+    VISTA = null;
+    dibuja();
+    pedirFondo(0);
+  }
+}
+
+function pintaLeyendaMantenedores() {
+  const div = $('#leyenda_mant');
+  if (!P || !P.asignaciones || !P.asignaciones.length) { div.style.display = 'none'; return; }
+  const conteo = new Map();
+  P.asignaciones.forEach((a, i) => {
+    if (!R[i] || !R[i].ok || !filaCumpleFiltro(a, i)) return;
+    const m = (a.value || '(Sin mantenedor)').trim();
+    conteo.set(m, (conteo.get(m) || 0) + 1);
+  });
+  if (!conteo.size) { div.style.display = 'none'; return; }
+  div.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  Array.from(conteo.entries()).sort((a, b) => cmpAlfa(a[0], b[0])).forEach(([m, c]) => {
+    const item = document.createElement('span');
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.style.background = colorMantenedor(m);
+    item.appendChild(chip);
+    item.append(`${m} (${c})`);
+    frag.appendChild(item);
+  });
+  div.appendChild(frag);
+  div.style.display = 'flex';
+}
+
+// ------------------------------------------------------------- Hit-test y Tooltip ligero del mapa
+function puntoEnPoligono(x, y, anillos) {
+  let dentro = false;
+  for (let i = 0, j = anillos.length - 1; i < anillos.length; j = i++) {
+    const xi = anillos[i][0], yi = anillos[i][1];
+    const xj = anillos[j][0], yj = anillos[j][1];
+    const intersecta = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-12) + xi);
+    if (intersecta) dentro = !dentro;
+  }
+  return dentro;
+}
+
+function distSqPuntoSegmento(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const l2 = dx * dx + dy * dy;
+  if (l2 === 0) return (px - x1) * (px - x1) + (py - y1) * (py - y1);
+  let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+  if (t < 0) t = 0; else if (t > 1) t = 1;
+  const projX = x1 + t * dx, projY = y1 + t * dy;
+  return (px - projX) * (px - projX) + (py - projY) * (py - projY);
+}
+
+function buscarCoberturaEnPunto(wx, wy, tolMundo) {
+  // 1º Prioridad: comprobar si el usuario hizo clic sobre un círculo rojo de desvío
+  const radioDianaSq = (tolMundo * 1.8) * (tolMundo * 1.8);
+  for (let i = 0; i < R.length; i++) {
+    const r = R[i];
+    const a = P.asignaciones[i];
+    if (!r || !r.ok || !r.pts_desvio || !r.pts_desvio.length || !filaCumpleFiltro(a, i)) continue;
+    for (let d = 0; d < r.pts_desvio.length; d++) {
+      const dx = wx - r.pts_desvio[d][0], dy = wy - r.pts_desvio[d][1];
+      if (dx * dx + dy * dy <= radioDianaSq) return i;
+    }
+  }
+
+  // 2º Comprobar interior o borde de los polígonos visibles
+  const tolSq = tolMundo * tolMundo;
+  let mejorIdx = null;
+  let mejorDistSq = tolSq;
+
+  for (let i = 0; i < R.length; i++) {
+    const r = R[i];
+    const a = P.asignaciones[i];
+    if (!r || !r.ok || !r.polis || !filaCumpleFiltro(a, i)) continue;
+    const bbs = r.bboxes || [];
+    for (let j = 0; j < r.polis.length; j++) {
+      const bb = bbs[j];
+      if (bb && (wx < bb[0] - tolMundo || wx > bb[2] + tolMundo || wy < bb[1] - tolMundo || wy > bb[3] + tolMundo)) {
+        continue;
+      }
+      const pol = r.polis[j];
+      if (puntoEnPoligono(wx, wy, pol)) {
+        return i;
+      }
+      for (let k = 0; k < pol.length - 1; k++) {
+        const d2 = distSqPuntoSegmento(wx, wy, pol[k][0], pol[k][1], pol[k + 1][0], pol[k + 1][1]);
+        if (d2 < mejorDistSq) {
+          mejorDistSq = d2;
+          mejorIdx = i;
+        }
+      }
+    }
+  }
+  return mejorIdx;
+}
+
+function ocultarTooltipMapa() {
+  const tip = $('#tip_mapa');
+  if (tip) tip.style.display = 'none';
+  if (SEL_IDX !== null) {
+    SEL_IDX = null;
+    dibuja();
+  }
+}
+
+function centrarEnPuntoDesvio(pt) {
+  if (!pt || !VISTA) return;
+  VISTA.cx = pt[0];
+  VISTA.cy = pt[1];
+  // Nivel de zoom cercano (~0.18 px/m -> unos 5 km de ancho de ventana) para ver el desvío con claridad
+  VISTA.escala = Math.max(VISTA.escala, 0.18);
+  dibuja();
+  pedirFondo(0);
+}
+
+function mostrarTooltipMapa(idx, clientX, clientY) {
+  const a = P.asignaciones[idx];
+  const r = R[idx];
+  if (!a || !r) return;
+
+  SEL_IDX = idx;
+  dibuja();
+
+  const tip = $('#tip_mapa');
+  const color = colorMantenedor(a.value);
+  const mant = a.value || '(Sin mantenedor)';
+  const eszTxt = (a.esz !== null && a.esz !== undefined) ? a.esz : 'auto';
+  const pkTxt = (!a.pk_desde && !a.pk_hasta) ? 'Recorrido completo (sin PK)' : `PK ${a.pk_desde || '0'} → ${a.pk_hasta || 'fin'}`;
+
+  tip.innerHTML = '';
+  const cab = document.createElement('div');
+  cab.className = 'tip-cab';
+  const spanTit = document.createElement('span');
+  const chip = document.createElement('span');
+  chip.className = 'chip';
+  chip.style.background = color;
+  spanTit.appendChild(chip);
+  spanTit.append(` ${a.via || '(Sin vía)'} · ESZ ${eszTxt}`);
+  const btnX = document.createElement('button');
+  btnX.className = 'tip-x';
+  btnX.textContent = '✕';
+  btnX.title = 'Cerrar';
+  btnX.addEventListener('click', ocultarTooltipMapa);
+  cab.appendChild(spanTit);
+  cab.appendChild(btnX);
+  tip.appendChild(cab);
+
+  const fTramo = document.createElement('div');
+  fTramo.className = 'tip-fila';
+  fTramo.innerHTML = `<strong>Tramo:</strong> ${pkTxt}`;
+  tip.appendChild(fTramo);
+
+  const fMant = document.createElement('div');
+  fMant.className = 'tip-fila';
+  fMant.textContent = `Mantenedor: ${mant}`;
+  tip.appendChild(fMant);
+
+  if (r.aviso) {
+    const fAv = document.createElement('div');
+    fAv.className = 'tip-fila warn';
+    fAv.style.fontSize = '11.5px';
+    fAv.textContent = (r.fuera_trazado ? '🛣️ ' : '⚠️ ') + r.aviso;
+    tip.appendChild(fAv);
+  }
+
+  const acc = document.createElement('div');
+  acc.className = 'tip-acc';
+  const bFilVia = document.createElement('button');
+  bFilVia.textContent = `Filtrar ${a.via}`;
+  bFilVia.addEventListener('click', () => {
+    $('#f_txt').value = a.via || '';
+    aplicarFiltroTabla(true);
+  });
+  acc.appendChild(bFilVia);
+
+  // Si tiene coordenadas de desvío, añadir botón directo para enfocar la cámara sobre el desvío
+  if (r.pts_desvio && r.pts_desvio.length) {
+    r.pts_desvio.forEach((pt, idxD) => {
+      const bIr = document.createElement('button');
+      bIr.className = 'pri';
+      bIr.textContent = r.pts_desvio.length > 1 ? `🎯 Ir al desvío ${idxD + 1} (${pt[2]} m)` : `🎯 Ir al desvío (${pt[2]} m)`;
+      bIr.addEventListener('click', () => centrarEnPuntoDesvio(pt));
+      acc.appendChild(bIr);
+    });
+  }
+
+  tip.appendChild(acc);
+  tip.style.display = 'block';
+
+  const rectWrap = $('#wrap_mapa').getBoundingClientRect();
+  let left = clientX - rectWrap.left + 12;
+  let top = clientY - rectWrap.top + 12;
+  const tw = tip.offsetWidth || 260;
+  const th = tip.offsetHeight || 120;
+  if (left + tw > rectWrap.width - 8) left = Math.max(8, clientX - rectWrap.left - tw - 12);
+  if (top + th > rectWrap.height - 8) top = Math.max(8, clientY - rectWrap.top - th - 12);
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+
+// ------------------------------------------------------------- mapa optimizado
+const VW = 900, VH = 380, VPAD = 20;
+let VISTA = null;
+let VISTA_AJUSTE = null;
+let MANO = true;
+let seqFondo = 0, timerFondo = null;
+
+function vistaInicialDesdeBBoxes(bboxes) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (let i = 0; i < bboxes.length; i++) {
+    const b = bboxes[i];
+    if (b[0] < x0) x0 = b[0];
+    if (b[1] < y0) y0 = b[1];
+    if (b[2] > x1) x1 = b[2];
+    if (b[3] > y1) y1 = b[3];
+  }
+  if (P.opciones.mostrar_municipios !== false && (FONDO.lineas.length || FONDO.provincias.length)) {
+    const mg = 0.3 * Math.max(x1 - x0, y1 - y0, 500);
+    x0 -= mg; x1 += mg; y0 -= mg; y1 += mg;
+  }
+  const escala = Math.min((VW - 2 * VPAD) / Math.max(x1 - x0, 1), (VH - 2 * VPAD) / Math.max(y1 - y0, 1));
+  return {cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, escala: escala};
+}
+
+function dibuja(textoEspera) {
+  const svg = $('#mapa'); svg.innerHTML = '';
+  const NS = 'http://www.w3.org/2000/svg';
+  if (textoEspera) {
+    const t = document.createElementNS(NS, 'text'); t.setAttribute('x', 450); t.setAttribute('y', 190);
+    t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#1f6feb'); t.setAttribute('font-weight', '600');
+    t.textContent = textoEspera;
+    svg.appendChild(t); return;
+  }
+
+  reconstruirCacheColores();
+  pintaLeyendaMantenedores();
+
+  const candidatos = [];
+  const bboxesTotales = [];
+  const desviosVisibles = [];
+
+  for (let i = 0; i < R.length; i++) {
+    const r = R[i];
+    const a = P.asignaciones[i];
+    if (r && r.ok && r.polis && filaCumpleFiltro(a, i)) {
+      const color = colorMantenedor((a && a.value) || '');
+      const bbs = r.bboxes || [];
+      for (let j = 0; j < r.polis.length; j++) {
+        const bb = bbs[j];
+        if (bb) bboxesTotales.push(bb);
+        candidatos.push({idx: i, p: r.polis[j], bb: bb, color: color});
+      }
+      if (r.pts_desvio && r.pts_desvio.length) {
+        r.pts_desvio.forEach(pt => desviosVisibles.push({idx: i, x: pt[0], y: pt[1], desv: pt[2]}));
+      }
+    }
+  }
+
+  if (!candidatos.length) {
+    const t = document.createElementNS(NS, 'text'); t.setAttribute('x', 450); t.setAttribute('y', 190);
+    t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#5b6877');
+    t.textContent = (R.length && hayFiltroActivo()) ? 'Ninguna cobertura coincide con el filtro actual' : 'Sin vista previa';
+    svg.appendChild(t); return;
+  }
+
+  if (!VISTA) {
+    VISTA = vistaInicialDesdeBBoxes(bboxesTotales);
+    VISTA_AJUSTE = Object.assign({}, VISTA);
+  }
+
+  const W = VW, H = VH, pad = VPAD, s = VISTA.escala;
+  const tx = x => W / 2 + (x - VISTA.cx) * s;
+  const ty = y => H / 2 - (y - VISTA.cy) * s;
+  const mk = (tag, atts) => { const e = document.createElementNS(NS, tag); for (const k in atts) e.setAttribute(k, atts[k]); return e; };
+  const pt = ([x, y]) => tx(x).toFixed(1) + ',' + ty(y).toFixed(1);
+
+  const wxMin = VISTA.cx - (W / 2 + 20) / s;
+  const wxMax = VISTA.cx + (W / 2 + 20) / s;
+  const wyMin = VISTA.cy - (H / 2 + 20) / s;
+  const wyMax = VISTA.cy + (H / 2 + 20) / s;
+
+  const hayFondo = P.opciones.mostrar_municipios !== false && ((FONDO.lineas && FONDO.lineas.length) || (FONDO.provincias && FONDO.provincias.length));
+  svg.style.background = (hayFondo && (!FONDO.rellenos || !FONDO.rellenos.length)) ? ESTILO_GEOMEDIA.tierra : '#ffffff';
+
+  const g = mk('g', {id: 'contenido'});
+  svg.appendChild(g);
+
+  if (P.opciones.mostrar_municipios !== false) {
+    if (FONDO.rellenos && FONDO.rellenos.length) {
+      const dRelleno = FONDO.rellenos.map(anillo => 'M' + anillo.map(pt).join('L') + 'Z').join('');
+      g.appendChild(mk('path', {d: dRelleno, fill: ESTILO_GEOMEDIA.tierra, stroke: 'none'}));
+    }
+    [['lineas', 'municipios'], ['provincias', 'provincias']].forEach(([clave, cap]) => {
+      if (!FONDO[clave] || !FONDO[clave].length) return;
+      const d = FONDO[clave].map(l => 'M' + l.map(pt).join('L')).join('');
+      const est = ESTILO_GEOMEDIA[cap];
+      g.appendChild(mk('path', {d: d, fill: 'none', stroke: est.color,
+                                'stroke-opacity': est.opacidad,
+                                'stroke-width': est.ancho,
+                                'stroke-linejoin': 'round', 'stroke-linecap': 'round'}));
+    });
+  }
+
+  const pathsPorColor = new Map();
+  const subPathsSeleccionados = [];
+  const minPxDistSq = 0.65 * 0.65;
+
+  for (let i = 0; i < candidatos.length; i++) {
+    const {idx, p, bb, color} = candidatos[i];
+    if (bb && (bb[2] < wxMin || bb[0] > wxMax || bb[3] < wyMin || bb[1] > wyMax)) {
+      continue;
+    }
+    let partes = pathsPorColor.get(color);
+    if (!partes) {
+      partes = [];
+      pathsPorColor.set(color, partes);
+    }
+
+    let coordsStr = '';
+    let prevSx = -99999, prevSy = -99999;
+    let countPts = 0;
+    for (let k = 0; k < p.length; k++) {
+      const sx = W / 2 + (p[k][0] - VISTA.cx) * s;
+      const sy = H / 2 - (p[k][1] - VISTA.cy) * s;
+      const dx = sx - prevSx, dy = sy - prevSy;
+      if (k === 0 || k === p.length - 1 || (dx * dx + dy * dy) >= minPxDistSq) {
+        coordsStr += (countPts === 0 ? 'M' : 'L') + sx.toFixed(1) + ',' + sy.toFixed(1);
+        prevSx = sx; prevSy = sy;
+        countPts++;
+      }
+    }
+    if (countPts >= 2) {
+      const cerrado = coordsStr + 'Z';
+      partes.push(cerrado);
+      if (idx === SEL_IDX) subPathsSeleccionados.push(cerrado);
+    }
+  }
+
+  pathsPorColor.forEach((listaSubPaths, color) => {
+    if (!listaSubPaths.length) return;
+    g.appendChild(mk('path', {
+      d: listaSubPaths.join(''),
+      fill: color,
+      'fill-opacity': '0.55',
+      stroke: color,
+      'stroke-width': '2.0',
+      'stroke-linejoin': 'round'
+    }));
+  });
+
+  if (subPathsSeleccionados.length) {
+    g.appendChild(mk('path', {
+      d: subPathsSeleccionados.join(''),
+      fill: '#ffff00',
+      'fill-opacity': '0.35',
+      stroke: '#111111',
+      'stroke-width': '3.0',
+      'stroke-linejoin': 'round'
+    }));
+  }
+
+  // Dibujar dianas rojas sobre los puntos donde alguna cobertura se desvía de CARRETERAS_BCN
+  desviosVisibles.forEach(dv => {
+    if (dv.x < wxMin || dv.x > wxMax || dv.y < wyMin || dv.y > wyMax) return;
+    const cx = tx(dv.x).toFixed(1), cy = ty(dv.y).toFixed(1);
+    g.appendChild(mk('circle', {
+      cx: cx, cy: cy, r: '8',
+      fill: 'rgba(211, 47, 47, 0.22)',
+      stroke: '#ffffff', 'stroke-width': '2.5'
+    }));
+    g.appendChild(mk('circle', {
+      cx: cx, cy: cy, r: '5',
+      fill: '#d32f2f',
+      stroke: '#ffeb3b', 'stroke-width': '1.8'
+    }));
+  });
+
+  if (P.opciones.mostrar_municipios !== false && FONDO.etiquetas) {
+    const cajas = [];
+    FONDO.etiquetas.slice().sort((p, q) => q.area - p.area).forEach(m => {
+      if (cajas.length >= 40) return;
+      const ancho = m.nombre.length * 6.3 + 8, alto = 15;
+      const vx0 = Math.max(tx(m.bbox[0]), 0), vx1 = Math.min(tx(m.bbox[2]), W);
+      const vy0 = Math.max(ty(m.bbox[3]), 0), vy1 = Math.min(ty(m.bbox[1]), H);
+      if (vx1 - vx0 < ancho * 0.8 || vy1 - vy0 < alto) return;
+      let X = tx(m.centro[0]), Y = ty(m.centro[1]);
+      if (X < vx0 + ancho / 2 || X > vx1 - ancho / 2 || Y < vy0 + alto || Y > vy1) { X = (vx0 + vx1) / 2; Y = (vy0 + vy1) / 2; }
+      X = Math.min(Math.max(X, ancho / 2 + 2), W - ancho / 2 - 2); Y = Math.min(Math.max(Y, alto), H - 4);
+      const caja = [X - ancho / 2, Y - alto, X + ancho / 2, Y];
+      if (cajas.some(c => caja[0] < c[2] && caja[2] > c[0] && caja[1] < c[3] && caja[3] > c[1])) return;
+      cajas.push(caja);
+      const base = {x: X.toFixed(1), y: Y.toFixed(1), 'text-anchor': 'middle', 'font-size': '10.5'};
+      const halo = mk('text', Object.assign({fill: 'none'}, base));
+      halo.style.stroke = ESTILO_GEOMEDIA.tierra; halo.style.strokeWidth = '3px'; halo.style.strokeLinejoin = 'round';
+      halo.textContent = m.nombre; g.appendChild(halo);
+      const t = mk('text', Object.assign({fill: '#5c5338', 'fill-opacity': '0.85'}, base));
+      t.textContent = m.nombre; g.appendChild(t);
+    });
+  }
+
+  const metros = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000].filter(L => L * s <= 180).pop();
+  if (metros) {
+    const w = metros * s, y = H - 12;
+    svg.appendChild(mk('path', {d: 'M' + pad + ',' + (y - 4) + 'L' + pad + ',' + y + 'L' + (pad + w) + ',' + y + 'L' + (pad + w) + ',' + (y - 4),
+                                fill: 'none', stroke: '#1d2733', 'stroke-width': '1.5'}));
+    const t = mk('text', {x: pad + w / 2, y: y - 6, 'text-anchor': 'middle', 'font-size': '11', fill: '#1d2733'});
+    t.textContent = metros >= 1000 ? (metros / 1000) + ' km' : metros + ' m'; svg.appendChild(t);
+  }
+}
+
+// --- herramientas del mapa
+function pedirFondo(retardo) {
+  clearTimeout(timerFondo);
+  if (!VISTA) return;
+  timerFondo = setTimeout(async () => {
+    if (P.opciones.mostrar_municipios === false) return;
+    const mi = ++seqFondo;
+    try {
+      const r = await post('/api/fondo', {vista: VISTA, opciones: P.opciones});
+      if (mi !== seqFondo) return;
+      FONDO = r.fondo; dibuja();
+    } catch (e) {}
+  }, retardo === undefined ? 220 : retardo);
+}
+function zoom(factor, px, py) {
+  if (!VISTA) return;
+  px = px === undefined ? VW / 2 : px; py = py === undefined ? VH / 2 : py;
+  const e0 = VISTA.escala;
+  const e1 = Math.min(Math.max(e0 * factor, VISTA_AJUSTE.escala / 16), 10);
+  if (e1 === e0) return;
+  const wx = VISTA.cx + (px - VW / 2) / e0, wy = VISTA.cy - (py - VH / 2) / e0;
+  VISTA.escala = e1;
+  VISTA.cx = wx - (px - VW / 2) / e1; VISTA.cy = wy + (py - VH / 2) / e1;
+  dibuja(); pedirFondo();
+}
+function verTodo() { if (!VISTA_AJUSTE) return; ocultarTooltipMapa(); VISTA = Object.assign({}, VISTA_AJUSTE); dibuja(); pedirFondo(); }
+function ponManoActiva(v) {
+  MANO = v;
+  $('#z_mano').classList.toggle('act', MANO);
+  const svg = $('#mapa'); svg.style.cursor = MANO ? 'grab' : 'default'; svg.style.touchAction = MANO ? 'none' : 'auto';
+}
+(function herramientasMapa() {
+  const svg = $('#mapa'); let arrastre = null;
+  const k = () => VW / svg.getBoundingClientRect().width;
+  const pos = e => { const r = svg.getBoundingClientRect(); return [(e.clientX - r.left) * k(), (e.clientY - r.top) * k()]; };
+  $('#z_in').addEventListener('click', () => zoom(1.5));
+  $('#z_out').addEventListener('click', () => zoom(1 / 1.5));
+  $('#z_mano').addEventListener('click', () => ponManoActiva(!MANO));
+  $('#z_todo').addEventListener('click', verTodo);
+  svg.addEventListener('pointerdown', e => {
+    if (!VISTA || e.button > 0) return;
+    if (svg.setPointerCapture) svg.setPointerCapture(e.pointerId);
+    arrastre = {x: e.clientX, y: e.clientY, dx: 0, dy: 0};
+    if (MANO) svg.style.cursor = 'grabbing';
+  });
+  svg.addEventListener('pointermove', e => {
+    if (!arrastre || !MANO) return;
+    arrastre.dx = (e.clientX - arrastre.x) * k(); arrastre.dy = (e.clientY - arrastre.y) * k();
+    if (Math.abs(arrastre.dx) + Math.abs(arrastre.dy) > 3) {
+      $('#tip_mapa').style.display = 'none';
+    }
+    const g = $('#contenido'); if (g) g.setAttribute('transform', 'translate(' + arrastre.dx + ' ' + arrastre.dy + ')');
+  });
+  const soltar = e => {
+    if (!arrastre) return;
+    const {dx, dy} = arrastre; arrastre = null; svg.style.cursor = MANO ? 'grab' : 'default';
+    if (Math.abs(dx) + Math.abs(dy) < 4) {
+      if (e && e.clientX !== undefined && VISTA) {
+        const [px, py] = pos(e);
+        const wx = VISTA.cx + (px - VW / 2) / VISTA.escala;
+        const wy = VISTA.cy - (py - VH / 2) / VISTA.escala;
+        const tolMundo = 6.0 / VISTA.escala;
+        const idxHit = buscarCoberturaEnPunto(wx, wy, tolMundo);
+        if (idxHit !== null) {
+          mostrarTooltipMapa(idxHit, e.clientX, e.clientY);
+        } else {
+          ocultarTooltipMapa();
+        }
+      }
+      return;
+    }
+    VISTA.cx -= dx / VISTA.escala; VISTA.cy += dy / VISTA.escala;
+    dibuja(); pedirFondo();
+  };
+  svg.addEventListener('pointerup', soltar); svg.addEventListener('pointercancel', soltar);
+  svg.addEventListener('wheel', e => { if (!VISTA) return; e.preventDefault(); $('#tip_mapa').style.display = 'none'; const [px, py] = pos(e); zoom(e.deltaY < 0 ? 1.25 : 1 / 1.25, px, py); }, {passive: false});
+  svg.addEventListener('dblclick', e => { if (!VISTA) return; const [px, py] = pos(e); zoom(2, px, py); });
+})();
+
+// ----------------------------------------------------------- acciones
+async function guardar() {
+  leeFormulario();
+  const r = await api('/api/proyecto', {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(P)});
+  P = r.proyecto; escribeFormulario(); pintaTabla();
+}
+async function conectar() {
+  limpiaMensajes(); leeFormulario();
+  const btn = $('#b_conectar');
+  btn.disabled = true; $('#st_datos').textContent = '⏳ Leyendo bases de datos…';
+  const banner = mensaje('Conectando y leyendo geometrías de los archivos de origen… Por favor, espere.', 'l');
+  try {
+    const r = await post('/api/conectar', {fuentes: P.fuentes});
+    banner.remove();
+    VIAS = r.vias; NMUN = r.n_municipios || 0; NPROV = r.n_provincias || 0; pintaVias(); pintaTabla(); avisos(r.avisos);
+    mensaje('Datos leídos: ' + VIAS.length + ' vías' + (NMUN ? ', ' + NMUN + ' municipios' : '') + (NPROV ? ', ' + NPROV + ' provincias' : '') + '.', 'o');
+    await guardar();
+    setColapsada('#sec_1', true);
+  } catch (e) { banner.remove(); VIAS = []; pintaVias(); mensaje(e.message, 'e'); $('#st_datos').textContent = ''; }
+  btn.disabled = false;
+}
+async function capas(n) {
+  limpiaMensajes();
+  const f = P.fuentes[n];
+  try {
+    const r = await post('/api/capas', {ruta: f.ruta});
+    const cont = $('#capas'); cont.innerHTML = '';
+    const tit = document.createElement('div'); tit.className = 'hint';
+    tit.textContent = 'Capas de ' + f.ruta + ' (pulse «Usar» para elegir la capa de este origen):';
+    cont.appendChild(tit);
+    const t = document.createElement('table');
+    t.innerHTML = '<tr><th>Capa</th><th>Geometría</th><th>Entidades</th><th>Campos</th><th></th></tr>';
+    r.capas.forEach(c => {
+      const tr = document.createElement('tr');
+      [c.capa, c.geometria, c.entidades === null ? '?' : c.entidades, c.campos.join(', ')].forEach(v => {
+        const td = document.createElement('td'); td.textContent = v; td.style.fontSize = '12px'; tr.appendChild(td);
+      });
+      const tb = document.createElement('td'); const b = document.createElement('button'); b.textContent = 'Usar';
+      b.addEventListener('click', () => { f.capa = c.capa; pintaFuentes(); mensaje('Capa «' + c.capa + '» asignada al origen ' + (n + 1) + '.', 'o'); });
+      tb.appendChild(b); tr.appendChild(tb); t.appendChild(tr);
+    });
+    cont.appendChild(t);
+  } catch (e) { mensaje(e.message, 'e'); }
+}
+async function previsualizar() {
+  limpiaMensajes(); leeFormulario(); ocultarTooltipMapa();
+  const btn = $('#b_prev');
+  const txtOrig = btn.textContent;
+  const total = P.asignaciones ? P.asignaciones.length : 0;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando vista previa…';
+  $('#st_prev').textContent = `Calculando ${total} cobertura(s)…`;
+  const banner = mensaje(`Calculando geometrías de ${total} cobertura(s) y verificando trazado contra CARRETERAS_BCN… Por favor, espere.`, 'l');
+  dibuja(`⏳ Calculando buffers de ${total} cobertura(s) y generando mapa…`);
+  try {
+    const r = await post('/api/previsualizar', {opciones: P.opciones, mantenedores: P.mantenedores, asignaciones: P.asignaciones});
+    banner.remove();
+    if (r.proyecto) { P = r.proyecto; escribeFormulario(); }
+    R = r.resultados;
+    precalcularBBoxesResultados();
+    FONDO = r.fondo || {lineas: [], provincias: [], etiquetas: [], rellenos: []}; VISTA = null;
+    avisos(r.avisos); pintaTabla(); dibuja();
+    if (hayFiltroActivo() && VISTA) pedirFondo(0);
+    if (R.every(x => x.ok) && R.length) {
+      const nTrazado = R.filter(x => x.fuera_trazado).length;
+      const nSolape = R.filter(x => x.aviso && !x.fuera_trazado).length;
+      if (nTrazado > 0 || nSolape > 0) {
+        mensaje(
+          `Previsualización lista: ${nTrazado} cobertura(s) con desvío de trazado CARRETERAS_BCN y ${nSolape} con aviso de solape.`,
+          'w'
+        );
+      } else {
+        mensaje('Todas las asignaciones son correctas, siguen el trazado de CARRETERAS_BCN y mantienen sus ESZ.', 'o');
+      }
+      setColapsada('#sec_1', true);
+      setColapsada('#sec_2', true);
+      setColapsada('#sec_3', true);
+      $('#sec_4').scrollIntoView({behavior: 'smooth', block: 'start'});
+    } else if (R.some(x => !x.ok)) {
+      const nErr = R.filter(x => !x.ok).length;
+      mensaje(`Hay ${nErr} asignación(es) con PK fuera de los tramos de la vía. Revise las filas marcadas en rojo.`, 'e');
+    }
+  } catch (e) {
+    banner.remove();
+    dibuja();
+    mensaje(e.message, 'e');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = txtOrig;
+    $('#st_prev').textContent = '';
+  }
+}
+async function descargar(tipo, nombre) {
+  limpiaMensajes();
+  const btn = tipo === 'ply' ? $('#b_ply') : $('#b_csv');
+  const txtOrig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando archivo…';
+  const banner = mensaje(`Generando archivo ${nombre} con todos los vértices… Por favor, espere.`, 'l');
+  try {
+    await guardar();
+    const r = await fetch('/api/exportar/' + tipo);
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || 'Error ' + r.status); }
+    const blob = await r.blob();
+    banner.remove();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+    avisos((await api('/api/proyecto')).avisos);
+    mensaje('Archivo ' + nombre + ' generado.', 'o');
+  } catch (e) {
+    banner.remove();
+    mensaje(e.message, 'e');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = txtOrig;
+  }
+}
+async function importarCSV(archivo) {
+  limpiaMensajes();
+  leeFormulario();
+  ocultarTooltipMapa();
+  const btn = $('#b_imp_csv');
+  const txtOrig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Importando CSV…';
+  const banner = mensaje(`Validando y cargando coberturas desde "${archivo.name}"… Por favor, espere.`, 'l');
+  const fd = new FormData();
+  fd.append('archivo', archivo);
+  try {
+    const r = await fetch('/api/importar_csv', {method: 'POST', body: fd});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || ('Error ' + r.status));
+
+    (j.mantenedores || []).forEach(m => {
+      if (m && !P.mantenedores.includes(m)) P.mantenedores.push(m);
+    });
+    P.mantenedores.sort(cmpAlfa);
+    $('#mantenedores').value = P.mantenedores.join('\n');
+
+    P.asignaciones.push(...(j.validas || []));
+    R = [];
+    VISTA = null;
+    await guardar();
+    banner.remove();
+
+    setColapsada('#sec_1', true);
+    setColapsada('#sec_2', true);
+    setColapsada('#sec_3', false);
+
+    const contDesc = $('#descartes_csv');
+    contDesc.innerHTML = '';
+    if (j.descartes && j.descartes.length) {
+      mensaje(`CSV cargado y consolidado: ${j.validas.length} cobertura(s) resultante(s) y ${j.descartes.length} descartada(s).`, 'w');
+      const det = document.createElement('details');
+      det.open = true;
+      det.innerHTML = `<summary class="warn" style="font-weight:600;margin-top:8px">⚠️ ${j.descartes.length} registro(s) descartado(s) del CSV (clic para ocultar)</summary>`;
+      const tbl = document.createElement('table');
+      tbl.style.marginTop = '6px';
+      tbl.innerHTML = '<thead><tr><th>Fila CSV</th><th>Vía</th><th>PK Inicio</th><th>PK Fin</th><th>Motivo del descarte</th></tr></thead>';
+      const tb = document.createElement('tbody');
+      j.descartes.forEach(d => {
+        const tr = document.createElement('tr');
+        [d.fila, d.via, d.pk_ini, d.pk_fin, d.motivo].forEach((val, idx) => {
+          const td = document.createElement('td');
+          td.textContent = val;
+          td.style.fontSize = '12px';
+          if (idx === 4) td.className = 'err';
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      });
+      tbl.appendChild(tb);
+      det.appendChild(tbl);
+      contDesc.appendChild(det);
+    } else {
+      mensaje(`CSV importado y consolidado: ${j.validas.length} cobertura(s) añadida(s).`, 'o');
+    }
+  } catch (e) {
+    banner.remove();
+    mensaje(e.message, 'e');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = txtOrig;
+    $('#f_csv').value = '';
+  }
+}
+
+let timerFiltro = null;
+$('#f_txt').addEventListener('input', () => {
+  clearTimeout(timerFiltro);
+  timerFiltro = setTimeout(() => aplicarFiltroTabla(true), 140);
+});
+$('#f_mant').addEventListener('change', () => aplicarFiltroTabla(true));
+$('#f_est').addEventListener('change', () => aplicarFiltroTabla(true));
+$('#b_limpiar_filtro').addEventListener('click', () => {
+  $('#f_txt').value = '';
+  $('#f_mant').value = '';
+  $('#f_est').value = '';
+  aplicarFiltroTabla(true);
+});
+
+$('#b_mas_filas').addEventListener('click', () => {
+  LIMITE_FILAS += 200;
+  pintaTabla();
+});
+$('#b_todas_filas').addEventListener('click', () => {
+  LIMITE_FILAS = 100000;
+  pintaTabla();
+});
+
+$('#b_add_fuente').addEventListener('click', añadeFuente);
+$('#o_mun').addEventListener('change', () => {
+  leeFormulario();
+  if (!R.length) { dibuja(); return; }
+  if (P.opciones.mostrar_municipios === false) { FONDO = {lineas: [], provincias: [], etiquetas: [], rellenos: []}; dibuja(); }
+  else pedirFondo(0);
+});
+$('#b_conectar').addEventListener('click', conectar);
+$('#b_add').addEventListener('click', () => {
+  leeFormulario();
+  setColapsada('#sec_3', false);
+  const mantFiltro = $('#f_mant').value || '';
+  const txtFiltro = ($('#f_txt').value || '').trim();
+  const viaInicial = MAPA_VIAS.has(txtFiltro.toUpperCase())
+    ? MAPA_VIAS.get(txtFiltro.toUpperCase()).via
+    : '';
+
+  P.asignaciones.push({
+    esz: null,
+    via: viaInicial,
+    pk_desde: '',
+    pk_hasta: '',
+    value: mantFiltro,
+    _nueva: true
+  });
+  R.length = P.asignaciones.length;
+  pintaTabla();
+
+  const filasDOM = document.querySelectorAll('#filas > tr');
+  const ultimaFila = filasDOM[filasDOM.length - 1];
+  if (ultimaFila) {
+    ultimaFila.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    const inputs = ultimaFila.querySelectorAll('input');
+    const targetInput = (viaInicial && inputs[2] && !inputs[2].disabled) ? inputs[2] : inputs[1];
+    if (targetInput) targetInput.focus();
+  }
+});
+$('#b_imp_csv').addEventListener('click', () => $('#f_csv').click());
+$('#f_csv').addEventListener('change', e => {
+  if (e.target.files && e.target.files[0]) importarCSV(e.target.files[0]);
+});
+$('#b_limpiar_asig').addEventListener('click', async () => {
+  limpiaMensajes();
+  ocultarTooltipMapa();
+  P.asignaciones = [];
+  R = [];
+  VISTA = null;
+  $('#descartes_csv').innerHTML = '';
+  await guardar();
+  dibuja();
+});
+$('#b_prev').addEventListener('click', previsualizar);
+$('#b_guardar').addEventListener('click', async () => { limpiaMensajes(); try { await guardar(); mensaje('Proyecto ordenado y guardado.', 'o'); } catch (e) { mensaje(e.message, 'e'); } });
+$('#b_ply').addEventListener('click', () => descargar('ply', 'zonas.ply'));
+$('#b_csv').addEventListener('click', () => descargar('csv', 'zonas_asignaciones.csv'));
+$('#mantenedores').addEventListener('change', () => { leeFormulario(); escribeFormulario(); pintaTabla(); dibuja(); });
+
+escribeFormulario();
+pintaTabla();
+dibuja();
+
+(async function init() {
+  try {
+    const r = await api('/api/proyecto');
+    if (r && r.proyecto) {
+      P = r.proyecto;
+      escribeFormulario();
+      pintaTabla();
+      dibuja();
+    }
+    if (r && r.vias) {
+      VIAS = r.vias; NMUN = r.n_municipios || 0; NPROV = r.n_provincias || 0;
+      pintaVias(); pintaTabla();
+      setColapsada('#sec_1', true);
+    }
+    else if (fuentesCompletas()) conectar();
+  } catch (e) { mensaje(e.message, 'e'); }
+})();
+</script>
+</body>
+</html>
