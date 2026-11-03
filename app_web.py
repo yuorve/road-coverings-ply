@@ -31,7 +31,7 @@ estado = {"datos": None, "gen": None, "gen_clave": None}
 DEFECTO = {
     "fuentes": [
         {"tipo": "mdb", "rol": "ejes", "ruta": "", "capa": "CARRETERAS_BCN", "epsg_origen": ""},
-        {"tipo": "mdb", "rol": "pk", "ruta": "", "capa": "PK_VIA", "epsg_origen": ""},
+        {"tipo": "mdb", "rol": "pk", "ruta": "", "capa": "PK_info_PCA", "epsg_origen": ""},
         {"tipo": "mdb", "rol": "municipios", "ruta": "", "capa": "da02_term_munic_mod_AF_SHP", "epsg_origen": ""},
         {"tipo": "mdb", "rol": "provincias", "ruta": "", "capa": "da03_provincia_AF_SHP", "epsg_origen": ""},
     ],
@@ -204,7 +204,7 @@ def migra(g):
                 {"tipo": "mdb", "rol": "ejes", "ruta": f.get("ruta", ""),
                  "capa": f.get("capa_ejes", "CARRETERAS_BCN"), "epsg_origen": f.get("epsg_origen", "")},
                 {"tipo": "mdb", "rol": "pk", "ruta": f.get("ruta", ""),
-                 "capa": f.get("capa_pk", "PK_VIA"), "epsg_origen": f.get("epsg_origen", "")}]
+                 "capa": f.get("capa_pk", "PK_info_PCA"), "epsg_origen": f.get("epsg_origen", "")}]
     return g
 
 
@@ -218,7 +218,7 @@ def sanea_fuentes(lista):
                     "epsg_origen": str(f.get("epsg_origen", "")).strip()})
     for rol, capa in (
         ("ejes", "CARRETERAS_BCN"),
-        ("pk", "PK_VIA"),
+        ("pk", "PK_info_PCA"),
         ("municipios", "da02_term_munic_mod_AF_SHP"),
         ("provincias", "da03_provincia_AF_SHP"),
     ):
