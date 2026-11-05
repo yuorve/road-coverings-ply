@@ -949,13 +949,11 @@ def exportar(tipo):
     return Response(datos, mimetype=mime,
                     headers={"Content-Disposition": f'attachment; filename="{nombre}"'})
 
-
 def main():
-    url = "http://127.0.0.1:5000"
-    threading.Timer(1.0, lambda: webbrowser.open(url)).start()
-    print(f"Interfaz en {url}   (Ctrl+C para salir)")
-    app.run(host="127.0.0.1", port=5000, debug=False)
-
+    host = os.environ.get("FLASK_HOST", "0.0.0.0")
+    port = int(os.environ.get("FLASK_PORT", "5000"))
+    print(f"Interfaz en http://{host}:{port}   (Ctrl+C para salir)", flush=True)
+    app.run(host=host, port=port, debug=False)
 
 if __name__ == "__main__":
     main()
