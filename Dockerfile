@@ -29,4 +29,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Comando por defecto para arrancar tu aplicación
-CMD ["python", "app_main.py"]
+CMD ["python", "app_web.py"]
